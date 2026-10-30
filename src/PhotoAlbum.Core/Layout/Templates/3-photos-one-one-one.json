@@ -1,0 +1,13 @@
+{
+  "name": "3-photos-one-one-one",
+  "description": "Three photographs side by side in a single row.",
+  "photoCount": 3,
+  "root": {
+    "split": "columns",
+    "children": [
+      { "slot": 1 },
+      { "slot": 2 },
+      { "slot": 3 }
+    ]
+  }
+}

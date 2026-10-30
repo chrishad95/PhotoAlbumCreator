@@ -1,0 +1,6 @@
+{
+  "name": "1-photo-single",
+  "description": "One photograph filling the usable page area. Required by the spec; not taken from an example image.",
+  "photoCount": 1,
+  "root": { "slot": 1 }
+}

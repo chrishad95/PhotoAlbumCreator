@@ -117,6 +117,27 @@ A running record of project decisions and the reasoning behind them. Newest entr
 
 ---
 
+## 2026-10-30 — Layout: JSON split-tree templates, no cropping
+
+**Decision:**
+- Page layouts are defined as JSON templates in `src/PhotoAlbum.Core/Layout/Templates/`. Each template has a `name`, `description`, `photoCount`, and a `root` tree. A node is either `{ "slot": n }` (a photograph) or `{ "split": "rows" | "columns", "children": [...] }`. Slots are numbered 1..N in reading order, so photograph order is preserved.
+- Photographs are never cropped in v1.0. Cell sizes come from the photographs' aspect ratios (photos in a row share a height, photos in a column share a width), and the result is scaled to fit the usable area and centered.
+- Where several templates exist for the same photo count, the engine ranks them as candidates in a deterministic order. A future UI "Shuffle" button steps through that list, so results stay repeatable.
+
+**Why:** New layouts can be added as text files with no code change and no new screenshots. The tree form describes every example layout the owner supplied. Aspect-ratio sizing satisfies the spec's no-crop, no-stretch rules.
+
+**Source examples:** PNG mock-ups in `photo album examples/` (git-ignored, not published). The "overlayed" two-photo example was converted to a plain stacked layout because the spec forbids overlap. The red dashed lines in the mock-ups come from another tool and are ignored; margins come from the configurable page margin. The front and back cover examples are out of scope for v1.0.
+
+**Templates cover 1-8 photographs.** For more than 8 (rare), the engine builds a grid in code instead of reading a JSON file. Photographs per row should be as equal as possible across rows. Owner's examples: 15 = 3 rows of 5; 16 = 4 rows of 4; 17 = 4 rows (three of 4, one of 5).
+- Row count = floor(sqrt(n)), which reproduces all three examples (the grid is wider than tall).
+- Photographs are spread across those rows as evenly as possible, so row sizes differ by at most one.
+
+**Future ideas (owner):**
+- Zoom, crop and reposition a photograph within its frame in the preview.
+- Swap two photographs between frames on a page.
+
+---
+
 ## Environment notes
 
 - The .NET 10 SDK (10.0.403) was installed with `winget install Microsoft.DotNet.SDK.10`. The first attempt failed with exit code 1602 because the UAC prompt was dismissed; the retry succeeded.

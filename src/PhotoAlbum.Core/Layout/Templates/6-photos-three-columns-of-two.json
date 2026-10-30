@@ -1,0 +1,31 @@
+{
+  "name": "6-photos-three-columns-of-two",
+  "description": "Three columns, each holding two stacked photographs. Example: 6 photos - various sizes 3x2 layout. Sizes vary because each photograph keeps its own aspect ratio.",
+  "photoCount": 6,
+  "root": {
+    "split": "columns",
+    "children": [
+      {
+        "split": "rows",
+        "children": [
+          { "slot": 1 },
+          { "slot": 2 }
+        ]
+      },
+      {
+        "split": "rows",
+        "children": [
+          { "slot": 3 },
+          { "slot": 4 }
+        ]
+      },
+      {
+        "split": "rows",
+        "children": [
+          { "slot": 5 },
+          { "slot": 6 }
+        ]
+      }
+    ]
+  }
+}

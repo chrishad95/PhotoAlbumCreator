@@ -1,0 +1,28 @@
+{
+  "name": "8-photos-four-by-two",
+  "description": "Eight photographs in a 4x2 grid: two rows of four.",
+  "photoCount": 8,
+  "root": {
+    "split": "rows",
+    "children": [
+      {
+        "split": "columns",
+        "children": [
+          { "slot": 1 },
+          { "slot": 2 },
+          { "slot": 3 },
+          { "slot": 4 }
+        ]
+      },
+      {
+        "split": "columns",
+        "children": [
+          { "slot": 5 },
+          { "slot": 6 },
+          { "slot": 7 },
+          { "slot": 8 }
+        ]
+      }
+    ]
+  }
+}

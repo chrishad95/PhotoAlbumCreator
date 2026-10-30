@@ -1,0 +1,12 @@
+{
+  "name": "2-photos-stacked",
+  "description": "Two photographs, one above the other. Derived from the example '2 photos - 1 top - 1 bottom - overlayed' with the overlap removed, because the spec forbids overlapping photographs.",
+  "photoCount": 2,
+  "root": {
+    "split": "rows",
+    "children": [
+      { "slot": 1 },
+      { "slot": 2 }
+    ]
+  }
+}

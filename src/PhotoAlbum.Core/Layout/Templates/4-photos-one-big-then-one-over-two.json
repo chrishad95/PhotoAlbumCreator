@@ -1,0 +1,24 @@
+{
+  "name": "4-photos-one-big-then-one-over-two",
+  "description": "One photograph on the left; on the right, one photograph above a side-by-side pair. Example: 4 photos 1 big then 1 over 2.",
+  "photoCount": 4,
+  "root": {
+    "split": "columns",
+    "children": [
+      { "slot": 1 },
+      {
+        "split": "rows",
+        "children": [
+          { "slot": 2 },
+          {
+            "split": "columns",
+            "children": [
+              { "slot": 3 },
+              { "slot": 4 }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

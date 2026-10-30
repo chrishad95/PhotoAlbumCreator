@@ -1,0 +1,27 @@
+{
+  "name": "7-photos-three-over-four",
+  "description": "A row of three photographs above a row of four.",
+  "photoCount": 7,
+  "root": {
+    "split": "rows",
+    "children": [
+      {
+        "split": "columns",
+        "children": [
+          { "slot": 1 },
+          { "slot": 2 },
+          { "slot": 3 }
+        ]
+      },
+      {
+        "split": "columns",
+        "children": [
+          { "slot": 4 },
+          { "slot": 5 },
+          { "slot": 6 },
+          { "slot": 7 }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "4-photos-two-by-two",
+  "description": "Four photographs in a 2x2 grid: two rows of two.",
+  "photoCount": 4,
+  "root": {
+    "split": "rows",
+    "children": [
+      {
+        "split": "columns",
+        "children": [
+          { "slot": 1 },
+          { "slot": 2 }
+        ]
+      },
+      {
+        "split": "columns",
+        "children": [
+          { "slot": 3 },
+          { "slot": 4 }
+        ]
+      }
+    ]
+  }
+}

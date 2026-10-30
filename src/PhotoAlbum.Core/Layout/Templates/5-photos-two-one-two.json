@@ -1,0 +1,25 @@
+{
+  "name": "5-photos-two-one-two",
+  "description": "A stacked pair on the left, one photograph in the middle, a stacked pair on the right. Example: 5 photos 2-1-2.",
+  "photoCount": 5,
+  "root": {
+    "split": "columns",
+    "children": [
+      {
+        "split": "rows",
+        "children": [
+          { "slot": 1 },
+          { "slot": 2 }
+        ]
+      },
+      { "slot": 3 },
+      {
+        "split": "rows",
+        "children": [
+          { "slot": 4 },
+          { "slot": 5 }
+        ]
+      }
+    ]
+  }
+}

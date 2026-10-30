@@ -1,0 +1,18 @@
+{
+  "name": "3-photos-one-large-then-one-over-one",
+  "description": "One photograph on the left, two stacked on the right. Example: 3 photos - 1 large then 1 over 1.",
+  "photoCount": 3,
+  "root": {
+    "split": "columns",
+    "children": [
+      { "slot": 1 },
+      {
+        "split": "rows",
+        "children": [
+          { "slot": 2 },
+          { "slot": 3 }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "name": "2-photos-side-by-side",
+  "description": "Two photographs next to each other. Example: 2 photos - side by side.",
+  "photoCount": 2,
+  "root": {
+    "split": "columns",
+    "children": [
+      { "slot": 1 },
+      { "slot": 2 }
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "name": "5-photos-three-over-two",
+  "description": "A row of three photographs above a row of two. Example: 5 photos - 3 top 2 bottom.",
+  "photoCount": 5,
+  "root": {
+    "split": "rows",
+    "children": [
+      {
+        "split": "columns",
+        "children": [
+          { "slot": 1 },
+          { "slot": 2 },
+          { "slot": 3 }
+        ]
+      },
+      {
+        "split": "columns",
+        "children": [
+          { "slot": 4 },
+          { "slot": 5 }
+        ]
+      }
+    ]
+  }
+}
