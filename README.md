@@ -121,6 +121,20 @@ Core layout algorithms are kept independent of the user interface and PDF librar
 
 ---
 
+## Build and Run
+
+Requires the [.NET 10 SDK](https://dotnet.microsoft.com/download) (Windows). A new terminal may be needed after installing it.
+
+```
+dotnet build PhotoAlbum.slnx
+dotnet test PhotoAlbum.slnx
+dotnet run --project src/PhotoAlbum.App
+```
+
+Project decisions and their reasoning are recorded in [`docs/decisions.md`](docs/decisions.md).
+
+---
+
 ## Out of Scope (Version 1.0)
 
 The following features are explicitly excluded from the initial release:
