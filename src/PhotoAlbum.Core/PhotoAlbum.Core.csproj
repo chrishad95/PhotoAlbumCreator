@@ -10,4 +10,8 @@
     <PackageReference Include="MetadataExtractor" Version="2.9.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Layout\Templates\*.json" LogicalName="Templates/%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>

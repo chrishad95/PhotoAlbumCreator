@@ -138,6 +138,24 @@ A running record of project decisions and the reasoning behind them. Newest entr
 
 ---
 
+## 2026-11-02 — Future exploration: generative AI and LLMs
+
+**Decision:** Record generative AI / LLM enhancements as a future area to explore. No AI work is in scope for v1.0, and the README's out-of-scope list still excludes AI-based selection, captions and face recognition for that release.
+
+**Candidate uses:** captions and page titles; event or scene grouping; hero-photo and layout suggestions; flagging duplicates and poor-quality photographs; natural-language album requests.
+
+**Constraints any AI feature must respect (from the spec and project security rules):**
+- **Privacy:** the spec requires all photo processing to stay local (§1.2, §1.3). Family photographs must not be sent to an external service by default. Prefer a local model (for example a local vision-language model). Any cloud option must be opt-in, clearly disclosed, and off by default.
+- **Offline:** the app works with no network. AI features must degrade gracefully when no model or connection is available.
+- **Secrets:** any API key comes from environment variables or a secure store, never from code or the repository.
+- **Transport:** any external call uses HTTPS (TLS 1.2 or higher) with certificate validation and timeouts.
+- **Non-destructive:** AI output is a suggestion the user can accept or reject. It never modifies original photographs and never silently reorders or drops them.
+- **Architecture:** put AI behind an interface in its own project so Core stays free of it, matching the Pdf separation.
+
+**Next step when picked up:** a short research spike comparing local and cloud options for one use case (captions are the likely first), covering quality, hardware needs, licensing, and cost.
+
+---
+
 ## Environment notes
 
 - The .NET 10 SDK (10.0.403) was installed with `winget install Microsoft.DotNet.SDK.10`. The first attempt failed with exit code 1602 because the UAC prompt was dismissed; the retry succeeded.

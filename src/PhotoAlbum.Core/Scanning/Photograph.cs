@@ -38,6 +38,9 @@ public sealed record Photograph(
     /// <summary>Height after applying EXIF orientation.</summary>
     public int DisplayHeight => IsRotated ? Width : Height;
 
+    /// <summary>Width divided by height after applying EXIF orientation.</summary>
+    public double AspectRatio => (double)DisplayWidth / DisplayHeight;
+
     /// <summary>Date used for chronological ordering: capture date, else fallback timestamp.</summary>
     public DateTime? SortDate => CaptureDate ?? FallbackTimestamp;
 }

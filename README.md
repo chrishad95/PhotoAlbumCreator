@@ -163,3 +163,9 @@ The following features are explicitly excluded from the initial release:
 - Additional image formats
 - Manual page or photograph ordering
 - Saved and reusable album projects
+- **Exploring generative AI and LLMs** to enhance the application (research only; see [`docs/decisions.md`](docs/decisions.md) for the constraints). Areas to investigate:
+  - Suggested captions or page titles from photograph content and capture dates.
+  - Grouping photographs into events or scenes beyond capture-time gaps.
+  - Choosing a "hero" photograph for each page and suggesting layouts.
+  - Flagging near-duplicate, blurry, or poorly exposed photographs for the user to review.
+  - Natural-language album requests, for example "make a vacation album with one photo per day".
