@@ -156,6 +156,25 @@ A running record of project decisions and the reasoning behind them. Newest entr
 
 ---
 
+## 2026-11-03 — PDF export: PDFsharp pinned to 6.2.4 (OPEN LICENCE/MAINTENANCE QUESTION)
+
+**Decision (provisional):** `PhotoAlbum.Pdf` uses PDFsharp **6.2.4** (MIT), not 6.5.0.
+
+**Why:** PDFsharp 6.5.0 (published 2026-10-14) is licensed **AGPL-3.0-only** and throws `PdfSharpLicenseException: The loaded license is not valid` the first time a `PdfDocument` is created, so PDF export fails. Versions 6.1.0 to 6.2.4 are MIT. The earlier note choosing PDFsharp as "MIT, no licence concerns" was true only for 6.2.x and earlier.
+
+**Conflict with project security rules:** 6.2.4 was published 2026-01-06, about 10 months ago, which is outside the "release within the last 6 months" maintenance check. 6.5.0 is the maintained line but its licence is not one of the preferred ones (Apache 2.0, MIT, BSD) and needs a licence key or AGPL compliance.
+
+**Options:**
+1. Keep PDFsharp 6.2.4 (MIT, stable, stale by the 6-month rule). Needs an explicit exception.
+2. Replace PDFsharp with SkiaSharp's built-in PDF writer. SkiaSharp is already a dependency (MIT, actively released), so this removes a package. Needs a spike to confirm JPEG data is embedded without recompression and EXIF rotation is handled, and a separate way to verify page count and size.
+3. Use PDFsharp 6.5.0 under a valid licence. Not preferred (AGPL).
+
+**Status:** owner decision 2026-11-03: keep PDFsharp 6.2.4 for now (option 1), accepting the exception to the 6-month release rule. Revisit with a spike on option 2 (SkiaSharp PDF writer) later.
+
+**Verified:** page count and size, original JPEG bytes embedded unchanged, EXIF orientations 1, 3, 6 and 8 rendered correctly (checked by rasterising a test PDF with PDFium).
+
+---
+
 ## Environment notes
 
 - The .NET 10 SDK (10.0.403) was installed with `winget install Microsoft.DotNet.SDK.10`. The first attempt failed with exit code 1602 because the UAC prompt was dismissed; the retry succeeded.

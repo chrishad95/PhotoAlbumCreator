@@ -1,11 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\PhotoAlbum.Core\PhotoAlbum.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="PDFsharp" Version="6.5.0" />
+    <PackageReference Include="PDFsharp" Version="6.2.4" />
     <PackageReference Include="SkiaSharp" Version="4.154.0" />
     <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
