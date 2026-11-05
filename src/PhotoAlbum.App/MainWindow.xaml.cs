@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using PhotoAlbum.Core.Album;
 using PhotoAlbum.Core.Layout;
 using PhotoAlbum.Core.Scanning;
+using PhotoAlbum.Core.Settings;
 using PhotoAlbum.Pdf;
 
 namespace PhotoAlbum.App;
@@ -17,7 +18,14 @@ public partial class MainWindow : Window
 {
     private const int MaxNamesShown = 5;
 
+    private static readonly string SettingsFile = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+        "PhotoAlbumCreator",
+        "settings.json");
+
     private readonly bool _ready;
+    private UserSettings _saved;
+    private string? _scanFolder;
     private ScanResult? _scan;
     private AlbumResult? _album;
     private string _scanNotice = string.Empty;
@@ -31,8 +39,71 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        _saved = UserSettingsStore.Load(SettingsFile);
+        ApplySavedSettings(_saved);
         _ready = true;
         UpdateControls();
+        Loaded += async (_, _) => await RestoreFolderAsync();
+    }
+
+    // ---- Saved settings ----
+
+    /// <summary>Fills the settings controls. Runs before <c>_ready</c> is set, so no unit conversion is triggered.</summary>
+    private void ApplySavedSettings(UserSettings s)
+    {
+        _unit = s.Unit;
+        UnitsCombo.SelectedIndex = s.Unit switch
+        {
+            LengthUnit.Millimeters => 1,
+            LengthUnit.Centimeters => 2,
+            _ => 0,
+        };
+
+        WidthBox.Text = Format(s.PageWidth);
+        HeightBox.Text = Format(s.PageHeight);
+        MinBox.Text = s.MinPerPage.ToString(CultureInfo.CurrentCulture);
+        MaxBox.Text = s.MaxPerPage.ToString(CultureInfo.CurrentCulture);
+        ChronoCheck.IsChecked = s.Chronological;
+        MarginBox.Text = Format(s.Margin);
+        SpacingBox.Text = Format(s.Spacing);
+        _lastExportDirectory = s.ExportDirectory is { } dir && Directory.Exists(dir) ? dir : null;
+    }
+
+    /// <summary>Re-scans the folder used last time, if it still exists, so the user can go straight to Generate.</summary>
+    private async Task RestoreFolderAsync()
+    {
+        if (_saved.SourceDirectory is { } folder && Directory.Exists(folder))
+        {
+            await LoadFolderAsync(folder);
+        }
+    }
+
+    /// <summary>Saves the current settings. A field that does not currently parse keeps its last saved value.</summary>
+    private void SaveSettings()
+    {
+        var s = _saved;
+        _saved = new UserSettings(
+            _scanFolder ?? s.SourceDirectory,
+            _lastExportDirectory ?? s.ExportDirectory,
+            ReadNumber(WidthBox) ?? s.PageWidth,
+            ReadNumber(HeightBox) ?? s.PageHeight,
+            SelectedUnit(),
+            ReadWholeNumber(MinBox) ?? s.MinPerPage,
+            ReadWholeNumber(MaxBox) ?? s.MaxPerPage,
+            ChronoCheck.IsChecked == true,
+            ReadNumber(MarginBox) ?? s.Margin,
+            ReadNumber(SpacingBox) ?? s.Spacing);
+
+        if (!UserSettingsStore.Save(SettingsFile, _saved))
+        {
+            AppLog.Error("Settings could not be saved", new IOException(SettingsFile));
+        }
+    }
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        SaveSettings();
+        base.OnClosing(e);
     }
 
     // ---- Section 1: photographs ----
@@ -40,12 +111,21 @@ public partial class MainWindow : Window
     private async void SelectFolder_Click(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFolderDialog { Title = "Select the folder containing your photographs" };
+        if (_scanFolder is { } previous && Directory.Exists(previous))
+        {
+            dialog.InitialDirectory = previous;
+        }
+
         if (dialog.ShowDialog(this) != true)
         {
             return;
         }
 
-        var folder = dialog.FolderName;
+        await LoadFolderAsync(dialog.FolderName);
+    }
+
+    private async Task LoadFolderAsync(string folder)
+    {
         DirectoryText.Text = folder;
         DirectoryText.ToolTip = folder;
         _scan = null;
@@ -70,6 +150,7 @@ public partial class MainWindow : Window
         }
 
         SetBusy(false);
+        _scanFolder = folder;
         var found = _scan.Photographs.Count;
         FoundText.Text = $"Photographs found: {found}";
         _scanNotice = DescribeUnreadable(_scan);
@@ -252,6 +333,7 @@ public partial class MainWindow : Window
         _albumWarnings = string.Join(Environment.NewLine, result.Warnings);
         ShowStatus($"Album ready: {result.Pages.Count} pages for {result.PhotographCount} photographs.");
         UpdateControls();
+        SaveSettings();
         await ShowPageAsync(0);
     }
 
@@ -346,6 +428,7 @@ public partial class MainWindow : Window
             var result = await Task.Run(() => PdfAlbumExporter.Export(album.Pages, album.Page, path, true, progress));
             _lastPdf = result.FilePath;
             _lastExportDirectory = Path.GetDirectoryName(result.FilePath);
+            SaveSettings();
             SetBusy(false);
             ShowStatus($"Exported {result.PageCount} pages.");
             ExportText.Text = result.FilePath;
