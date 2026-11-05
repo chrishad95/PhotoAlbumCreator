@@ -26,6 +26,7 @@ public partial class MainWindow : Window
     private string? _lastExportDirectory;
     private LengthUnit _unit = LengthUnit.Inches;
     private bool _busy;
+    private int _pageIndex;
 
     public MainWindow()
     {
@@ -49,6 +50,7 @@ public partial class MainWindow : Window
         DirectoryText.ToolTip = folder;
         _scan = null;
         _album = null;
+        Preview.Clear();
         _scanNotice = string.Empty;
         _albumWarnings = string.Empty;
         FoundText.Text = "Photographs found: 0";
@@ -201,6 +203,7 @@ public partial class MainWindow : Window
 
         _album = null;
         _albumWarnings = string.Empty;
+        Preview.Clear();
         ShowStatus("Settings changed. Select Generate Album to update the album.");
         UpdateControls();
     }
@@ -224,6 +227,7 @@ public partial class MainWindow : Window
         var photographs = _scan.Photographs;
         _album = null;
         _albumWarnings = string.Empty;
+        Preview.Clear();
         ExportText.Text = string.Empty;
         SetBusy(true, "Arranging photographs...");
 
@@ -248,9 +252,58 @@ public partial class MainWindow : Window
         _albumWarnings = string.Join(Environment.NewLine, result.Warnings);
         ShowStatus($"Album ready: {result.Pages.Count} pages for {result.PhotographCount} photographs.");
         UpdateControls();
+        await ShowPageAsync(0);
     }
 
-    // ---- Section 4: export ----
+    // ---- Section 4: preview ----
+
+    private async void PrevPage_Click(object sender, RoutedEventArgs e) => await ShowPageAsync(_pageIndex - 1);
+
+    private async void NextPage_Click(object sender, RoutedEventArgs e) => await ShowPageAsync(_pageIndex + 1);
+
+    private async void GoTo_Click(object sender, RoutedEventArgs e) => await GoToEnteredPageAsync();
+
+    private async void GoToBox_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Enter)
+        {
+            await GoToEnteredPageAsync();
+        }
+    }
+
+    private async Task GoToEnteredPageAsync()
+    {
+        if (_album is not { } album)
+        {
+            return;
+        }
+
+        if (ReadWholeNumber(GoToBox) is not { } number || number < 1 || number > album.Pages.Count)
+        {
+            ShowStatus($"Enter a page number from 1 to {album.Pages.Count}.", true);
+            return;
+        }
+
+        await ShowPageAsync(number - 1);
+    }
+
+    private async Task ShowPageAsync(int index)
+    {
+        if (_album is not { IsSuccess: true } album || album.Pages.Count == 0)
+        {
+            return;
+        }
+
+        _pageIndex = Math.Clamp(index, 0, album.Pages.Count - 1);
+        GoToBox.Text = (_pageIndex + 1).ToString(CultureInfo.CurrentCulture);
+        UpdateControls();
+
+        var maxWidth = Math.Max(100, PreviewHost.ActualWidth - 2);
+        var maxHeight = Math.Max(100, PreviewHost.Height - 2);
+        await Preview.ShowAsync(album.Pages[_pageIndex], album.Page, maxWidth, maxHeight);
+    }
+
+    // ---- Section 5: export ----
 
     private async void Export_Click(object sender, RoutedEventArgs e)
     {
@@ -380,6 +433,13 @@ public partial class MainWindow : Window
         SettingsGrid.IsEnabled = !_busy;
         GenerateButton.IsEnabled = !_busy && hasPhotos;
         ExportButton.IsEnabled = !_busy && _album is not null;
+
+        var pageCount = _album?.Pages.Count ?? 0;
+        PrevButton.IsEnabled = !_busy && _pageIndex > 0 && pageCount > 0;
+        NextButton.IsEnabled = !_busy && _pageIndex < pageCount - 1;
+        GoToBox.IsEnabled = !_busy && pageCount > 0;
+        GoToButton.IsEnabled = GoToBox.IsEnabled;
+        PageText.Text = pageCount > 0 ? $"Page {_pageIndex + 1} of {pageCount}" : "No pages yet";
         OpenPdfButton.IsEnabled = !_busy && _lastPdf is not null && File.Exists(_lastPdf);
         OpenFolderButton.IsEnabled = OpenPdfButton.IsEnabled;
 
