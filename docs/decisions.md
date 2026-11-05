@@ -175,6 +175,41 @@ A running record of project decisions and the reasoning behind them. Newest entr
 
 ---
 
+## 2026-11-05 — Status of the first working version, and what changed since the plan
+
+**Status:** Steps 2 to 5 of the 2026-10-30 plan are done, and step 6 (preview and saved settings), which was deferred, is now done too. The app scans, sorts, distributes, lays out, previews and exports.
+
+**Added beyond the plan:**
+- **Swap button** next to page width and height.
+- **Page preview:** previous, next, "Page N of M" and go-to-page. Only the current page is drawn, using photographs decoded at no more than 800 pixels wide, so full-resolution images are never held in memory. It uses the same `OrientationTransform` as the exporters so the preview matches the output.
+- **Saved settings:** a JSON file at `%LocalAppData%\PhotoAlbumCreator\settings.json`, holding the last folders, page size, units, photos per page, chronological toggle, margin and spacing. The model and store live in Core so they can be unit-tested. Loading never throws: each unusable value falls back to its default on its own, and the file is written to a temporary name and then moved into place.
+- **PNG export** (see the next entry).
+
+**Not done yet:** the chosen export format and PNG resolution are not saved. The layout "Shuffle" button is not built, although the engine already ranks candidates for it. The PDFsharp licence and maintenance question is still open (2026-11-03). The spec's acceptance checklist (§11) has not been run against a real photograph folder.
+
+---
+
+## 2026-11-05 — PNG export at print resolution, in its own project
+
+**Decision:** Add an option to export one PNG image per page instead of a PDF, for photo-book services such as Snapfish, Shutterfly and Walmart. It lives in a new project, `src/PhotoAlbum.Png`, which references Core and SkiaSharp only.
+
+**Why:**
+- Those services usually take page images, not a PDF, and expect about 300 DPI. The default is therefore 300 DPI, with 150, 200 and 600 as choices. Pixel size is page size × DPI (8 × 10 inches at 300 DPI is 2400 × 3000).
+- SkiaSharp is already a dependency (MIT, actively released), so no new package was added. A separate project mirrors the PDF one and keeps Core free of imaging code.
+- Photographs are drawn from the full-resolution originals using the same orientation transform as the PDF and the preview, so all three agree.
+
+**Behaviour:**
+- Files are named `photo_album_page_001.png` and so on, padded so they sort in page order.
+- Skia's PNG encoder does not write a resolution, so a small `pHYs` chunk is inserted after the header. Pixel data is not touched, and the tests check the chunk values.
+- Output is all-or-nothing. Pages are written under temporary names, each is checked for the expected pixel size, and they are renamed only when every page succeeded. A failure or cancellation leaves no partial set, and existing files are untouched.
+- The user is asked before replacing images from an earlier export.
+- A page over 150 million pixels is refused before any memory is allocated. A 200 × 200 inch page at 300 DPI is far beyond any book page.
+- Originals are never modified, and error messages show a file name but never a full path.
+
+**Open question:** each service has its own exact page size and may require bleed. There is no bleed setting. The user enters the service's full page size, bleed included, as the page dimensions. Revisit with a bleed option or per-service presets once the real requirements are known.
+
+---
+
 ## Environment notes
 
 - The .NET 10 SDK (10.0.403) was installed with `winget install Microsoft.DotNet.SDK.10`. The first attempt failed with exit code 1602 because the UAC prompt was dismissed; the retry succeeded.
