@@ -116,6 +116,22 @@
 
             <GroupBox Header="5. Export" Margin="0,12,0,0" Padding="8">
                 <StackPanel>
+                    <StackPanel x:Name="FormatPanel" Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="Format" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <RadioButton x:Name="PdfRadio" Content="PDF document" IsChecked="True" GroupName="Format"
+                                     VerticalAlignment="Center" Checked="Format_Changed"/>
+                        <RadioButton x:Name="PngRadio" Content="PNG images (one per page)" GroupName="Format"
+                                     VerticalAlignment="Center" Margin="16,0,0,0" Checked="Format_Changed"/>
+                    </StackPanel>
+                    <StackPanel x:Name="DpiPanel" Orientation="Horizontal" Margin="0,0,0,8" Visibility="Collapsed">
+                        <TextBlock Text="Resolution" VerticalAlignment="Center" Margin="0,0,12,0"/>
+                        <ComboBox x:Name="DpiCombo" Width="150" SelectedIndex="2">
+                            <ComboBoxItem Content="150 DPI (draft)" Tag="150"/>
+                            <ComboBoxItem Content="200 DPI" Tag="200"/>
+                            <ComboBoxItem Content="300 DPI (print)" Tag="300"/>
+                            <ComboBoxItem Content="600 DPI (large file)" Tag="600"/>
+                        </ComboBox>
+                    </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Button x:Name="ExportButton" Content="Export PDF..." Padding="10,4"
                                 IsEnabled="False" Click="Export_Click"/>

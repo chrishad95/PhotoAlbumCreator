@@ -172,6 +172,13 @@
           "SkiaSharp": "[4.154.0, )",
           "System.Security.Cryptography.Pkcs": "[10.0.14, )"
         }
+      },
+      "photoalbum.png": {
+        "type": "Project",
+        "dependencies": {
+          "PhotoAlbum.Core": "[1.0.0, )",
+          "SkiaSharp": "[4.154.0, )"
+        }
       }
     }
   }

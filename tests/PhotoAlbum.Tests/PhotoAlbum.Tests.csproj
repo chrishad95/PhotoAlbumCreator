@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\PhotoAlbum.Core\PhotoAlbum.Core.csproj" />
     <ProjectReference Include="..\..\src\PhotoAlbum.Pdf\PhotoAlbum.Pdf.csproj" />
+    <ProjectReference Include="..\..\src\PhotoAlbum.Png\PhotoAlbum.Png.csproj" />
   </ItemGroup>
 
 </Project>

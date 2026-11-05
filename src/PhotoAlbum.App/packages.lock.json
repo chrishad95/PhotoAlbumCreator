@@ -68,6 +68,13 @@
           "PhotoAlbum.Core": "[1.0.0, )",
           "SkiaSharp": "[4.154.0, )"
         }
+      },
+      "photoalbum.png": {
+        "type": "Project",
+        "dependencies": {
+          "PhotoAlbum.Core": "[1.0.0, )",
+          "SkiaSharp": "[4.154.0, )"
+        }
       }
     }
   }

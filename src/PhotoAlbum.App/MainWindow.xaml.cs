@@ -11,6 +11,7 @@ using PhotoAlbum.Core.Layout;
 using PhotoAlbum.Core.Scanning;
 using PhotoAlbum.Core.Settings;
 using PhotoAlbum.Pdf;
+using PhotoAlbum.Png;
 
 namespace PhotoAlbum.App;
 
@@ -31,6 +32,7 @@ public partial class MainWindow : Window
     private string _scanNotice = string.Empty;
     private string _albumWarnings = string.Empty;
     private string? _lastPdf;
+    private string? _lastOutput;
     private string? _lastExportDirectory;
     private LengthUnit _unit = LengthUnit.Inches;
     private bool _busy;
@@ -394,6 +396,12 @@ public partial class MainWindow : Window
             return;
         }
 
+        if (PngRadio.IsChecked == true)
+        {
+            await ExportPngAsync(album);
+            return;
+        }
+
         // The dialog asks before replacing an existing file, as the spec requires.
         var dialog = new SaveFileDialog
         {
@@ -427,6 +435,7 @@ public partial class MainWindow : Window
         {
             var result = await Task.Run(() => PdfAlbumExporter.Export(album.Pages, album.Page, path, true, progress));
             _lastPdf = result.FilePath;
+            _lastOutput = result.FilePath;
             _lastExportDirectory = Path.GetDirectoryName(result.FilePath);
             SaveSettings();
             SetBusy(false);
@@ -444,6 +453,98 @@ public partial class MainWindow : Window
             AppLog.Error("PDF export failed", ex);
             SetBusy(false);
             ShowStatus("The PDF could not be saved. Check the location and try again.", true);
+        }
+
+        UpdateControls();
+    }
+
+    private void Format_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_ready)
+        {
+            return;
+        }
+
+        var png = PngRadio.IsChecked == true;
+        DpiPanel.Visibility = png ? Visibility.Visible : Visibility.Collapsed;
+        ExportButton.Content = png ? "Export PNG Images..." : "Export PDF...";
+    }
+
+    private int SelectedDpi() =>
+        DpiCombo.SelectedItem is ComboBoxItem { Tag: string tag } &&
+        int.TryParse(tag, NumberStyles.Integer, CultureInfo.InvariantCulture, out var dpi) && dpi > 0
+            ? dpi
+            : PngAlbumExporter.DefaultDpi;
+
+    private async Task ExportPngAsync(AlbumResult album)
+    {
+        var dialog = new OpenFolderDialog { Title = "Choose a folder for the page images" };
+        if (_lastExportDirectory is { } previous && Directory.Exists(previous))
+        {
+            dialog.InitialDirectory = previous;
+        }
+
+        if (dialog.ShowDialog(this) != true)
+        {
+            return;
+        }
+
+        var folder = dialog.FolderName;
+        var dpi = SelectedDpi();
+        var pageCount = album.Pages.Count;
+        const string baseName = "photo_album";
+
+        // Page images are named photo_album_page_001.png and so on. Ask before replacing files from an earlier export.
+        var existing = PngAlbumExporter.FilePathsFor(folder, baseName, pageCount).Count(File.Exists);
+        if (existing > 0)
+        {
+            var answer = MessageBox.Show(
+                this,
+                $"{existing} image file(s) with the same names already exist in this folder. Replace them?",
+                "Replace existing images?",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question,
+                MessageBoxResult.No);
+            if (answer != MessageBoxResult.Yes)
+            {
+                return;
+            }
+        }
+
+        Progress.Maximum = pageCount;
+        Progress.Value = 0;
+        SetBusy(true, "Exporting images...", indeterminate: false);
+        ExportText.Text = string.Empty;
+
+        var progress = new Progress<int>(done =>
+        {
+            Progress.Value = done;
+            StatusText.Text = $"Exporting image {done} of {pageCount}...";
+        });
+
+        try
+        {
+            var result = await Task.Run(
+                () => PngAlbumExporter.Export(album.Pages, album.Page, folder, baseName, dpi, true, progress));
+            _lastPdf = null;
+            _lastOutput = result.FilePaths[0];
+            _lastExportDirectory = result.Directory;
+            SaveSettings();
+            SetBusy(false);
+            ShowStatus($"Exported {result.PageCount} images, {result.PixelWidth} x {result.PixelHeight} pixels at {result.Dpi} DPI.");
+            ExportText.Text = result.Directory;
+        }
+        catch (PngExportException ex)
+        {
+            AppLog.Error("PNG export failed", ex);
+            SetBusy(false);
+            ShowStatus(ex.Message, true);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            AppLog.Error("PNG export failed", ex);
+            SetBusy(false);
+            ShowStatus("The images could not be saved. Check the location and try again.", true);
         }
 
         UpdateControls();
@@ -469,7 +570,7 @@ public partial class MainWindow : Window
 
     private void OpenFolder_Click(object sender, RoutedEventArgs e)
     {
-        if (_lastPdf is null)
+        if (_lastOutput is null)
         {
             return;
         }
@@ -477,7 +578,7 @@ public partial class MainWindow : Window
         try
         {
             var info = new ProcessStartInfo("explorer.exe");
-            info.ArgumentList.Add($"/select,{_lastPdf}");
+            info.ArgumentList.Add($"/select,{_lastOutput}");
             Process.Start(info);
         }
         catch (Win32Exception ex)
@@ -524,7 +625,7 @@ public partial class MainWindow : Window
         GoToButton.IsEnabled = GoToBox.IsEnabled;
         PageText.Text = pageCount > 0 ? $"Page {_pageIndex + 1} of {pageCount}" : "No pages yet";
         OpenPdfButton.IsEnabled = !_busy && _lastPdf is not null && File.Exists(_lastPdf);
-        OpenFolderButton.IsEnabled = OpenPdfButton.IsEnabled;
+        OpenFolderButton.IsEnabled = !_busy && _lastOutput is not null && File.Exists(_lastOutput);
 
         var warnings = string.Join(
             Environment.NewLine, new[] { _scanNotice, _albumWarnings }.Where(s => s.Length > 0));
