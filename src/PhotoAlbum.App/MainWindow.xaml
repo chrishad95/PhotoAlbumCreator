@@ -1,12 +1,105 @@
-﻿<Window x:Class="PhotoAlbum.App.MainWindow"
+<Window x:Class="PhotoAlbum.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PhotoAlbum.App"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Photo Album Page Creator"
+        Width="580" Height="700" MinWidth="540" MinHeight="620"
+        WindowStartupLocation="CenterScreen">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="16">
 
-    </Grid>
+            <GroupBox Header="1. Photographs" Padding="8">
+                <StackPanel>
+                    <DockPanel>
+                        <Button x:Name="SelectButton" DockPanel.Dock="Left" Content="Select Photo Directory..."
+                                Padding="10,4" Click="SelectFolder_Click"/>
+                        <TextBlock x:Name="DirectoryText" Margin="10,0,0,0" VerticalAlignment="Center"
+                                   TextTrimming="CharacterEllipsis" Text="No folder selected"/>
+                    </DockPanel>
+                    <TextBlock x:Name="FoundText" Margin="0,8,0,0" Text="Photographs found: 0"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="2. Page settings" Margin="0,12,0,0" Padding="8">
+                <Grid x:Name="SettingsGrid">
+                    <Grid.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="0,4,12,4"/>
+                        </Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Width" Value="90"/>
+                            <Setter Property="HorizontalAlignment" Value="Left"/>
+                            <Setter Property="Margin" Value="0,4"/>
+                            <Setter Property="Padding" Value="2"/>
+                        </Style>
+                    </Grid.Resources>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="220"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                        <RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Page width"/>
+                    <TextBox x:Name="WidthBox" Grid.Row="0" Grid.Column="1" Text="8" TextChanged="SettingChanged"/>
+
+                    <TextBlock Grid.Row="1" Text="Page height"/>
+                    <TextBox x:Name="HeightBox" Grid.Row="1" Grid.Column="1" Text="10" TextChanged="SettingChanged"/>
+
+                    <TextBlock Grid.Row="2" Text="Units"/>
+                    <ComboBox x:Name="UnitsCombo" Grid.Row="2" Grid.Column="1" Width="120" Margin="0,4"
+                              HorizontalAlignment="Left" SelectedIndex="0" SelectionChanged="UnitsCombo_SelectionChanged">
+                        <ComboBoxItem Content="Inches"/>
+                        <ComboBoxItem Content="Millimeters"/>
+                        <ComboBoxItem Content="Centimeters"/>
+                    </ComboBox>
+
+                    <TextBlock Grid.Row="3" Text="Minimum photographs per page"/>
+                    <TextBox x:Name="MinBox" Grid.Row="3" Grid.Column="1" Text="1" TextChanged="SettingChanged"/>
+
+                    <TextBlock Grid.Row="4" Text="Maximum photographs per page"/>
+                    <TextBox x:Name="MaxBox" Grid.Row="4" Grid.Column="1" Text="4" TextChanged="SettingChanged"/>
+
+                    <TextBlock Grid.Row="5" Text="Arrange chronologically"/>
+                    <CheckBox x:Name="ChronoCheck" Grid.Row="5" Grid.Column="1" IsChecked="True" Margin="0,6"
+                              Content="Yes (oldest first)" Checked="SettingChanged" Unchecked="SettingChanged"/>
+
+                    <TextBlock Grid.Row="6" Text="Page margin"/>
+                    <TextBox x:Name="MarginBox" Grid.Row="6" Grid.Column="1" Text="0.25" TextChanged="SettingChanged"/>
+
+                    <TextBlock Grid.Row="7" Text="Photo spacing"/>
+                    <TextBox x:Name="SpacingBox" Grid.Row="7" Grid.Column="1" Text="0.1" TextChanged="SettingChanged"/>
+                </Grid>
+            </GroupBox>
+
+            <GroupBox Header="3. Generate" Margin="0,12,0,0" Padding="8">
+                <StackPanel>
+                    <Button x:Name="GenerateButton" Content="Generate Album" Padding="10,4"
+                            HorizontalAlignment="Left" IsEnabled="False" Click="Generate_Click"/>
+                    <ProgressBar x:Name="Progress" Height="8" Margin="0,10,0,0" Visibility="Collapsed"/>
+                    <TextBlock x:Name="StatusText" Margin="0,8,0,0" TextWrapping="Wrap"
+                               Text="Select a folder of photographs to begin."/>
+                    <TextBlock x:Name="WarningsText" Margin="0,6,0,0" TextWrapping="Wrap"
+                               Foreground="DarkGoldenrod" Visibility="Collapsed"/>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="4. Export" Margin="0,12,0,0" Padding="8">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="ExportButton" Content="Export PDF..." Padding="10,4"
+                                IsEnabled="False" Click="Export_Click"/>
+                        <Button x:Name="OpenPdfButton" Content="Open PDF" Padding="10,4" Margin="10,0,0,0"
+                                IsEnabled="False" Click="OpenPdf_Click"/>
+                        <Button x:Name="OpenFolderButton" Content="Show in Folder" Padding="10,4" Margin="10,0,0,0"
+                                IsEnabled="False" Click="OpenFolder_Click"/>
+                    </StackPanel>
+                    <TextBlock x:Name="ExportText" Margin="0,8,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+            </GroupBox>
+
+        </StackPanel>
+    </ScrollViewer>
 </Window>
