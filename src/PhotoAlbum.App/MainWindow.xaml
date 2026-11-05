@@ -48,6 +48,11 @@
                     <TextBlock Grid.Row="1" Text="Page height"/>
                     <TextBox x:Name="HeightBox" Grid.Row="1" Grid.Column="1" Text="10" TextChanged="SettingChanged"/>
 
+                    <Button x:Name="SwapButton" Grid.Row="0" Grid.RowSpan="2" Grid.Column="1" Content="Swap"
+                            ToolTip="Swap width and height (e.g. 8 x 10 to 10 x 8)" Padding="10,2"
+                            HorizontalAlignment="Left" VerticalAlignment="Center" Margin="100,0,0,0"
+                            Click="Swap_Click"/>
+
                     <TextBlock Grid.Row="2" Text="Units"/>
                     <ComboBox x:Name="UnitsCombo" Grid.Row="2" Grid.Column="1" Width="120" Margin="0,4"
                               HorizontalAlignment="Left" SelectedIndex="0" SelectionChanged="UnitsCombo_SelectionChanged">

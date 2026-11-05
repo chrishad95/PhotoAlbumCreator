@@ -97,6 +97,9 @@ public partial class MainWindow : Window
 
     private void SettingChanged(object sender, RoutedEventArgs e) => InvalidateAlbum();
 
+    private void Swap_Click(object sender, RoutedEventArgs e) =>
+        (WidthBox.Text, HeightBox.Text) = (HeightBox.Text, WidthBox.Text);
+
     private void UnitsCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!_ready)
